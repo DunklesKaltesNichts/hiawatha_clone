@@ -70,7 +70,7 @@ cp wigwam.exe root/Hiawatha/program
 cp mbedtls/library/cygmbed*.dll root/Hiawatha/program
 strip root/Hiawatha/program/*.exe
 
-files="cygcrypt-0.dll cyggcc_s-1.dll cyggcc_s-seh-1.dll cygrunsrv.exe cygiconv-2.dll cygwin1.dll cygxml2-2.dll cygxslt-1.dll cygz.dll cyglzma-5.dll"
+files="cygcrypt-2.dll cyggcc_s-1.dll cyggcc_s-seh-1.dll cygrunsrv.exe cygiconv-2.dll cygwin1.dll cygxml2-2.dll cygxslt-1.dll cygz.dll cyglzma-5.dll"
 for file in ${files}; do
 	if [ -f /bin/${file} ]; then
 		cp /bin/${file} root/Hiawatha/program

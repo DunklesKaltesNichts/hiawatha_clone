@@ -406,7 +406,7 @@ t_config *default_config(void) {
 #endif
 
 #ifdef ENABLE_TLS
-	config->min_tls_version    = MBEDTLS_SSL_MINOR_VERSION_2;
+	config->min_tls_version    = MBEDTLS_SSL_MINOR_VERSION_3;
 	config->dh_size            = 2048;
 	config->ca_certificates    = NULL;
 #endif

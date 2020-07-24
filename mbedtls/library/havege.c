@@ -2,21 +2,19 @@
  *  \brief HAVEGE: HArdware Volatile Entropy Gathering and Expansion
  *
  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
- *  SPDX-License-Identifier: GPL-2.0
+ *  SPDX-License-Identifier: Apache-2.0
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  *
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
@@ -28,11 +26,7 @@
  *  Contact: seznec(at)irisa_dot_fr - orocheco(at)irisa_dot_fr
  */
 
-#if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
+#include "common.h"
 
 #if defined(MBEDTLS_HAVEGE_C)
 
@@ -40,18 +34,8 @@
 #include "mbedtls/timing.h"
 #include "mbedtls/platform_util.h"
 
-#include <limits.h>
+#include <stdint.h>
 #include <string.h>
-
-/* If int isn't capable of storing 2^32 distinct values, the code of this
- * module may cause a processor trap or a miscalculation. If int is more
- * than 32 bits, the code may not calculate the intended values. */
-#if INT_MIN + 1 != -0x7fffffff
-#error "The HAVEGE module requires int to be exactly 32 bits, with INT_MIN = -2^31."
-#endif
-#if UINT_MAX != 0xffffffff
-#error "The HAVEGE module requires unsigned to be exactly 32 bits."
-#endif
 
 /* ------------------------------------------------------------------------
  * On average, one iteration accesses two 8-word blocks in the havege WALK
@@ -67,7 +51,7 @@
  * ------------------------------------------------------------------------
  */
 
-#define SWAP(X,Y) { unsigned *T = (X); (X) = (Y); (Y) = T; }
+#define SWAP(X,Y) { uint32_t *T = (X); (X) = (Y); (Y) = T; }
 
 #define TST1_ENTER if( PTEST & 1 ) { PTEST ^= 3; PTEST >>= 1;
 #define TST2_ENTER if( PTEST & 1 ) { PTEST ^= 3; PTEST >>= 1;
@@ -90,7 +74,7 @@
     PTX = (PT1 >> 18) & 7;                              \
     PT1 &= 0x1FFF;                                      \
     PT2 &= 0x1FFF;                                      \
-    CLK = (unsigned) mbedtls_timing_hardclock();        \
+    CLK = (uint32_t) mbedtls_timing_hardclock();        \
                                                         \
     i = 0;                                              \
     A = &WALK[PT1    ]; RES[i++] ^= *A;                 \
@@ -113,7 +97,7 @@
                                                         \
     IN = (*A >> (5)) ^ (*A << (27)) ^ CLK;              \
     *A = (*B >> (6)) ^ (*B << (26)) ^ CLK;              \
-    *B = IN; CLK = (unsigned) mbedtls_timing_hardclock(); \
+    *B = IN; CLK = (uint32_t) mbedtls_timing_hardclock();       \
     *C = (*C >> (7)) ^ (*C << (25)) ^ CLK;              \
     *D = (*D >> (8)) ^ (*D << (24)) ^ CLK;              \
                                                         \
@@ -164,20 +148,20 @@
     PT1 ^= (PT2 ^ 0x10) & 0x10;                         \
                                                         \
     for( n++, i = 0; i < 16; i++ )                      \
-        POOL[n % MBEDTLS_HAVEGE_COLLECT_SIZE] ^= RES[i];
+        hs->pool[n % MBEDTLS_HAVEGE_COLLECT_SIZE] ^= RES[i];
 
 /*
  * Entropy gathering function
  */
 static void havege_fill( mbedtls_havege_state *hs )
 {
-    unsigned i, n = 0;
-    unsigned  U1,  U2, *A, *B, *C, *D;
-    unsigned PT1, PT2, *WALK, *POOL, RES[16];
-    unsigned PTX, PTY, CLK, PTEST, IN;
+    size_t n = 0;
+    size_t i;
+    uint32_t  U1,  U2, *A, *B, *C, *D;
+    uint32_t PT1, PT2, *WALK, RES[16];
+    uint32_t PTX, PTY, CLK, PTEST, IN;
 
-    WALK = (unsigned *) hs->WALK;
-    POOL = (unsigned *) hs->pool;
+    WALK = hs->WALK;
     PT1  = hs->PT1;
     PT2  = hs->PT2;
 
@@ -226,7 +210,7 @@ void mbedtls_havege_free( mbedtls_havege_state *hs )
  */
 int mbedtls_havege_random( void *p_rng, unsigned char *buf, size_t len )
 {
-    int val;
+    uint32_t val;
     size_t use_len;
     mbedtls_havege_state *hs = (mbedtls_havege_state *) p_rng;
     unsigned char *p = buf;
@@ -234,8 +218,8 @@ int mbedtls_havege_random( void *p_rng, unsigned char *buf, size_t len )
     while( len > 0 )
     {
         use_len = len;
-        if( use_len > sizeof(int) )
-            use_len = sizeof(int);
+        if( use_len > sizeof( val ) )
+            use_len = sizeof( val );
 
         if( hs->offset[1] >= MBEDTLS_HAVEGE_COLLECT_SIZE )
             havege_fill( hs );

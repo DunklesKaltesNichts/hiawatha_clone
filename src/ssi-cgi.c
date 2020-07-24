@@ -63,6 +63,8 @@ t_config *get_configuration(void) {
 		return NULL;
 	}
 
+	init_charlist(&(config->extension));
+
 	if ((extensions = strdup(SSI_EXTENSIONS)) == NULL) {
 		free(config);
 		return NULL;

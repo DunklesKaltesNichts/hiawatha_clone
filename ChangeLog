@@ -1,3 +1,11 @@
+hiawatha (10.11) stable; urgency=low
+
+  * Default value of MinTLSversion set to 1.2.
+  * mbed TLS updated to 2.23.0.
+  * Small bugfixes.
+
+ -- Hugo Leisink <hugo@leisink.net>  Wed,  8 Jul 2020 14:31:50 +0200
+
 hiawatha (10.10) stable; urgency=low
 
   * Removed several build options. Functionalities are now always enabled.

@@ -14,38 +14,27 @@ mbedtls_disable() {
 	perl -pi -e "s/^#define ${1}$/\/\/#define ${1}/" include/mbedtls/config.h
 }
 
+cd `dirname $0`
+
 if [ ! `which curl` ]; then
 	echo "Curl not found."
 	exit
 fi
 
-version=`curl -s https://tls.mbed.org/download/latest-stable-version`
-current=`grep "^=" ChangeLog | head -1 | cut -f4 -d' '`
-
-if [ "${version}" = "${current}" ]; then
-	echo "mbed TLS is already the latest version."
-	exit
-fi
-
-echo "Downloading mbed TLS version ${version}."
-curl -so mbedtls.tgz "https://tls.mbed.org/download/mbedtls-${version}-gpl.tgz"
-
-if [ ! -s mbedtls.tgz ]; then 
-	rm -f mbedtls.tgz
-	echo "Download error."
-	exit
-fi
+echo "Downloading mbed TLS latest version."
+curl -sO https://codeload.github.com/ARMmbed/mbedtls/zip/development
+unzip -q development
+rm -f development
+version=`grep "^=" mbedtls-development/ChangeLog | head -1 | cut -f4 -d' '`
 
 echo "Removing current mbed TLS library."
 rm -rf include
 rm -rf library
 
 echo "Installing new mbed TLS library."
-tar -xzf mbedtls.tgz
-dir=`tar -tzf mbedtls.tgz | head -n1 | sed 's/\/$//'`
-mv ${dir}/ChangeLog .
-mv ${dir}/include .
-mv ${dir}/library .
+mv mbedtls-development/ChangeLog .
+mv mbedtls-development/include .
+mv mbedtls-development/library .
 
 mbedtls_enable MBEDTLS_THREADING_PTHREAD
 mbedtls_enable MBEDTLS_THREADING_C
@@ -63,7 +52,6 @@ fi
 echo "Cleaning up."
 rm -f include/.gitignore
 rm -f library/.gitignore
-rm -rf ${dir}
-rm mbedtls.tgz
+rm -rf mbedtls-development
 
 echo "mbed TLS upgraded to version ${version}."

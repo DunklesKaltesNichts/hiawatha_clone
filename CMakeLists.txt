@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(Hiawatha VERSION 10.10 LANGUAGES C)
+project(Hiawatha VERSION 10.11 LANGUAGES C)
 
 # Compiler
 set(CMAKE_C_FLAGS "-O2 -Wall -Wextra ${CMAKE_C_FLAGS}")

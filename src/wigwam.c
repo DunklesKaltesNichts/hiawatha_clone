@@ -37,6 +37,7 @@
 #include "mbedtls/ssl.h"
 #include "mbedtls/x509.h"
 #endif
+#include "tls.h"
 
 #define MAX_INPUT_SIZE KILOBYTE
 #define MAX_PATH 1024
@@ -356,8 +357,8 @@ int check_main_config(char *config_dir) {
 	char *item, *rest, *info;
 	bool inside_section, has_dot;
 #ifdef ENABLE_TLS
-	mbedtls_pk_context private_key;
-	mbedtls_x509_crt certificate;
+	TLS_key private_key;
+	TLS_cert certificate;
 	char *last_file = NULL;
 #endif
 

@@ -5,21 +5,19 @@
  */
 /*
  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
- *  SPDX-License-Identifier: GPL-2.0
+ *  SPDX-License-Identifier: Apache-2.0
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  *
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
@@ -41,12 +39,12 @@
 #define MBEDTLS_BN_MUL_H
 
 #if !defined(MBEDTLS_CONFIG_FILE)
-#include "config.h"
+#include "mbedtls/config.h"
 #else
 #include MBEDTLS_CONFIG_FILE
 #endif
 
-#include "bignum.h"
+#include "mbedtls/bignum.h"
 
 #if defined(MBEDTLS_HAVE_ASM)
 
@@ -199,6 +197,30 @@
     );
 
 #endif /* AMD64 */
+
+#if defined(__aarch64__)
+
+#define MULADDC_INIT                \
+    asm(
+
+#define MULADDC_CORE                \
+        "ldr x4, [%2], #8   \n\t"   \
+        "ldr x5, [%1]       \n\t"   \
+        "mul x6, x4, %3     \n\t"   \
+        "umulh x7, x4, %3   \n\t"   \
+        "adds x5, x5, x6    \n\t"   \
+        "adc x7, x7, xzr    \n\t"   \
+        "adds x5, x5, %0    \n\t"   \
+        "adc %0, x7, xzr    \n\t"   \
+        "str x5, [%1], #8   \n\t"
+
+#define MULADDC_STOP                        \
+         : "+r" (c),  "+r" (d), "+r" (s)    \
+         : "r" (b)                          \
+         : "x4", "x5", "x6", "x7", "cc"     \
+    );
+
+#endif /* Aarch64 */
 
 #if defined(__mc68020__) || defined(__mcpu32__)
 

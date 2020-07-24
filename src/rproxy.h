@@ -21,6 +21,7 @@
 #ifdef ENABLE_TLS
 #include "mbedtls/platform.h"
 #include "mbedtls/ssl.h"
+#include "tls.h"
 #endif
 #include "ip.h"
 #include "liblist.h"
@@ -71,7 +72,7 @@ typedef struct {
 	int socket;
 #ifdef ENABLE_TLS
 	bool use_tls;
-	mbedtls_ssl_context tls_context;
+	TLS_context tls_context;
 #endif
 } t_rproxy_webserver;
 

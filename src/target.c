@@ -1759,7 +1759,7 @@ int proxy_request(t_session *session, t_rproxy *rproxy) {
 	if (session->rproxy_kept_alive && ((same_ip(&(session->rproxy_addr), &(rproxy->ip_addr)) == false) || (session->rproxy_port != rproxy->port))) {
 #ifdef ENABLE_TLS
 		if (session->rproxy_use_tls) {
-			tls_close(&(session->rproxy_ssl));
+			tls_close(&(session->rproxy_tls));
 		}
 #endif
 		close(session->rproxy_socket);
@@ -1773,7 +1773,7 @@ int proxy_request(t_session *session, t_rproxy *rproxy) {
 			if (errno != EAGAIN) {
 #ifdef ENABLE_TLS
 				if (session->rproxy_use_tls) {
-					tls_close(&(session->rproxy_ssl));
+					tls_close(&(session->rproxy_tls));
 				}
 #endif
 				close(session->rproxy_socket);
@@ -1791,7 +1791,7 @@ int proxy_request(t_session *session, t_rproxy *rproxy) {
 		webserver.use_tls = session->rproxy_use_tls;
 
 		if (webserver.use_tls) {
-			memcpy(&(webserver.tls_context), &(session->rproxy_ssl), sizeof(mbedtls_ssl_context));
+			memcpy(&(webserver.tls_context), &(session->rproxy_tls), sizeof(mbedtls_ssl_context));
 		}
 #endif
 	} else {
@@ -2178,7 +2178,7 @@ int proxy_request(t_session *session, t_rproxy *rproxy) {
 #ifdef ENABLE_TLS
 		session->rproxy_use_tls = webserver.use_tls;
 		if (session->rproxy_use_tls) {
-			memcpy(&(session->rproxy_ssl), &(webserver.tls_context), sizeof(mbedtls_ssl_context));
+			memcpy(&(session->rproxy_tls), &(webserver.tls_context), sizeof(mbedtls_ssl_context));
 		}
 #endif
 	}

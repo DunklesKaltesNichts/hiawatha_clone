@@ -118,7 +118,7 @@ typedef struct type_session {
 	/* TLS
 	 */
 #ifdef ENABLE_TLS
-	mbedtls_ssl_context tls_context;
+	TLS_context     tls_context;
 #endif
 
 	/* Output buffer
@@ -140,7 +140,7 @@ typedef struct type_session {
 	int             rproxy_socket;
 #ifdef ENABLE_TLS
 	bool            rproxy_use_tls;
-	mbedtls_ssl_context rproxy_ssl;
+	TLS_context     rproxy_tls;
 #endif
 #endif
 

@@ -265,7 +265,7 @@ Default = mimetype.conf     Example: MimetypeConfig = /etc/mime.types
 .B MinTLSversion = 1.0|1.1|1.2
 Specify the minimum TLS version Hiawatha accepts for HTTPS connections.
 .br
-Default = 1.1, Example: MinTLSversion = 1.2
+Default = 1.2, Example: MinTLSversion = 1.1
 .br
 
 (requires that Hiawatha was not compiled with -DENABLE_TLS=off)

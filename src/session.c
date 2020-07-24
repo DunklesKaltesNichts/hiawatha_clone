@@ -231,7 +231,7 @@ void destroy_session(t_session *session) {
 	if (session->rproxy_kept_alive) {
 #ifdef ENABLE_TLS
 		if (session->rproxy_use_tls) {
-			tls_close(&(session->rproxy_ssl));
+			tls_close(&(session->rproxy_tls));
 		}
 #endif
 		close(session->rproxy_socket);

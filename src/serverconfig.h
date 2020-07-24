@@ -149,38 +149,38 @@ typedef struct type_throttle {
 } t_throttle;
 
 typedef struct type_binding {
-	char          *binding_id;
-	int           port;
-	t_ip_addr     interface;
+	char       *binding_id;
+	int        port;
+	t_ip_addr  interface;
 #ifdef ENABLE_TLS
-	bool          use_tls;
-	char          *key_cert_file;
-	char          *ca_cert_file;
-	char          *ca_crl_file;
-	mbedtls_ssl_config *tls_config;
-	mbedtls_pk_context *private_key;
-	mbedtls_x509_crt   *certificate;
-	mbedtls_x509_crt   *ca_certificate;
-	mbedtls_x509_crl   *ca_crl;
+	bool       use_tls;
+	char       *key_cert_file;
+	char       *ca_cert_file;
+	char       *ca_crl_file;
+	TLS_config *tls_config;
+	TLS_key    *private_key;
+	TLS_cert   *certificate;
+	TLS_cert   *ca_certificate;
+	TLS_crl    *ca_crl;
 #endif
 
 #ifdef HAVE_ACCF
-	bool          enable_accf;
+	bool       enable_accf;
 #endif
-	bool          enable_alter;
-	bool          enable_trace;
-	int           max_keepalive;
-	long          max_request_size;
-	long          max_upload_size;
+	bool       enable_alter;
+	bool       enable_trace;
+	int        max_keepalive;
+	long       max_request_size;
+	long       max_upload_size;
 	struct pollfd *poll_data;
-	int           socket;
-	int           time_for_1st_request;
-	int           time_for_request;
+	int        socket;
+	int        time_for_1st_request;
+	int        time_for_request;
 
 	struct type_binding *next;
 
 #ifdef ENABLE_HTTP2
-	bool          accept_http2;
+	bool       accept_http2;
 #endif
 } t_binding;
 
@@ -279,10 +279,10 @@ typedef struct type_host {
 	char            *key_cert_file;
 	char            *ca_cert_file;
 	char            *ca_crl_file;
-	mbedtls_pk_context *private_key;
-	mbedtls_x509_crt   *certificate;
-	mbedtls_x509_crt   *ca_certificate;
-	mbedtls_x509_crl   *ca_crl;
+	TLS_key         *private_key;
+	TLS_cert        *certificate;
+	TLS_cert        *ca_certificate;
+	TLS_crl         *ca_crl;
 	int             random_header_length;
 	t_hpkp_data     *hpkp_data;
 #endif
@@ -429,9 +429,9 @@ typedef struct type_config {
 #endif
 
 #ifdef ENABLE_TLS
-	int              min_tls_version;
-	int              dh_size;
-	mbedtls_x509_crt *ca_certificates;
+	int           min_tls_version;
+	int           dh_size;
+	TLS_cert      *ca_certificates;
 #endif
 } t_config;
 

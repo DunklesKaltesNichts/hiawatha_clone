@@ -2,21 +2,19 @@
  *  FIPS-197 compliant AES implementation
  *
  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
- *  SPDX-License-Identifier: GPL-2.0
+ *  SPDX-License-Identifier: Apache-2.0
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may
+ *  not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU General Public License along
- *  with this program; if not, write to the Free Software Foundation, Inc.,
- *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  *
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
@@ -27,11 +25,7 @@
  *  http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
  */
 
-#if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
+#include "common.h"
 
 #if defined(MBEDTLS_AES_C)
 
@@ -40,6 +34,7 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/platform_util.h"
+#include "mbedtls/error.h"
 #if defined(MBEDTLS_PADLOCK_C)
 #include "mbedtls/padlock.h"
 #endif
@@ -768,7 +763,7 @@ int mbedtls_aes_xts_setkey_enc( mbedtls_aes_xts_context *ctx,
                                 const unsigned char *key,
                                 unsigned int keybits)
 {
-    int ret;
+    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     const unsigned char *key1, *key2;
     unsigned int key1bits, key2bits;
 
@@ -793,7 +788,7 @@ int mbedtls_aes_xts_setkey_dec( mbedtls_aes_xts_context *ctx,
                                 const unsigned char *key,
                                 unsigned int keybits)
 {
-    int ret;
+    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     const unsigned char *key1, *key2;
     unsigned int key1bits, key2bits;
 
@@ -920,6 +915,18 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
     PUT_UINT32_LE( X2, output,  8 );
     PUT_UINT32_LE( X3, output, 12 );
 
+    mbedtls_platform_zeroize( &X0, sizeof( X0 ) );
+    mbedtls_platform_zeroize( &X1, sizeof( X1 ) );
+    mbedtls_platform_zeroize( &X2, sizeof( X2 ) );
+    mbedtls_platform_zeroize( &X3, sizeof( X3 ) );
+
+    mbedtls_platform_zeroize( &Y0, sizeof( Y0 ) );
+    mbedtls_platform_zeroize( &Y1, sizeof( Y1 ) );
+    mbedtls_platform_zeroize( &Y2, sizeof( Y2 ) );
+    mbedtls_platform_zeroize( &Y3, sizeof( Y3 ) );
+
+    mbedtls_platform_zeroize( &RK, sizeof( RK ) );
+
     return( 0 );
 }
 #endif /* !MBEDTLS_AES_ENCRYPT_ALT */
@@ -987,6 +994,18 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
     PUT_UINT32_LE( X1, output,  4 );
     PUT_UINT32_LE( X2, output,  8 );
     PUT_UINT32_LE( X3, output, 12 );
+
+    mbedtls_platform_zeroize( &X0, sizeof( X0 ) );
+    mbedtls_platform_zeroize( &X1, sizeof( X1 ) );
+    mbedtls_platform_zeroize( &X2, sizeof( X2 ) );
+    mbedtls_platform_zeroize( &X3, sizeof( X3 ) );
+
+    mbedtls_platform_zeroize( &Y0, sizeof( Y0 ) );
+    mbedtls_platform_zeroize( &Y1, sizeof( Y1 ) );
+    mbedtls_platform_zeroize( &Y2, sizeof( Y2 ) );
+    mbedtls_platform_zeroize( &Y3, sizeof( Y3 ) );
+
+    mbedtls_platform_zeroize( &RK, sizeof( RK ) );
 
     return( 0 );
 }
@@ -1177,7 +1196,7 @@ int mbedtls_aes_crypt_xts( mbedtls_aes_xts_context *ctx,
                            const unsigned char *input,
                            unsigned char *output )
 {
-    int ret;
+    int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     size_t blocks = length / 16;
     size_t leftover = length % 16;
     unsigned char tweak[16];
@@ -1824,7 +1843,7 @@ int mbedtls_aes_self_test( int verbose )
         mode = i & 1;
 
         if( verbose != 0 )
-            mbedtls_printf( "  AES-ECB-%3d (%s): ", keybits,
+            mbedtls_printf( "  AES-ECB-%3u (%s): ", keybits,
                             ( mode == MBEDTLS_AES_DECRYPT ) ? "dec" : "enc" );
 
         memset( buf, 0, 16 );
@@ -1886,7 +1905,7 @@ int mbedtls_aes_self_test( int verbose )
         mode = i & 1;
 
         if( verbose != 0 )
-            mbedtls_printf( "  AES-CBC-%3d (%s): ", keybits,
+            mbedtls_printf( "  AES-CBC-%3u (%s): ", keybits,
                             ( mode == MBEDTLS_AES_DECRYPT ) ? "dec" : "enc" );
 
         memset( iv , 0, 16 );
@@ -1961,7 +1980,7 @@ int mbedtls_aes_self_test( int verbose )
         mode = i & 1;
 
         if( verbose != 0 )
-            mbedtls_printf( "  AES-CFB128-%3d (%s): ", keybits,
+            mbedtls_printf( "  AES-CFB128-%3u (%s): ", keybits,
                             ( mode == MBEDTLS_AES_DECRYPT ) ? "dec" : "enc" );
 
         memcpy( iv,  aes_test_cfb128_iv, 16 );
@@ -2024,7 +2043,7 @@ int mbedtls_aes_self_test( int verbose )
         mode = i & 1;
 
         if( verbose != 0 )
-            mbedtls_printf( "  AES-OFB-%3d (%s): ", keybits,
+            mbedtls_printf( "  AES-OFB-%3u (%s): ", keybits,
                             ( mode == MBEDTLS_AES_DECRYPT ) ? "dec" : "enc" );
 
         memcpy( iv,  aes_test_ofb_iv, 16 );

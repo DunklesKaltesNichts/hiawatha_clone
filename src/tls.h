@@ -16,6 +16,12 @@
 
 #ifdef ENABLE_TLS
 
+#define TLS_context mbedtls_ssl_context
+#define TLS_config  mbedtls_ssl_config
+#define TLS_key     mbedtls_pk_context
+#define TLS_cert    mbedtls_x509_crt
+#define TLS_crl     mbedtls_x509_crl
+
 #include <stdbool.h>
 #include "liblist.h"
 #include "mbedtls/platform.h"
@@ -33,12 +39,12 @@
 #endif
 
 typedef struct {
-	mbedtls_pk_context *private_key;
-	mbedtls_x509_crt   *certificate;
-	mbedtls_x509_crt   *ca_certificate;
-	mbedtls_x509_crl   *ca_crl;
-	int                min_tls_version;
-	int                dh_size;
+	TLS_key  *private_key;
+	TLS_cert *certificate;
+	TLS_cert *ca_certificate;
+	TLS_crl  *ca_crl;
+	int      min_tls_version;
+	int      dh_size;
 } t_tls_setup;
 
 typedef struct type_hpkp_data {
@@ -50,28 +56,28 @@ typedef struct type_hpkp_data {
 	struct type_hpkp_data *next;
 } t_hpkp_data;
 
-int  init_tls_module(mbedtls_x509_crt *ca_certificats);
-int  tls_set_config(mbedtls_ssl_config **tls_config, t_tls_setup *tls_setup);
+int  init_tls_module(TLS_cert *ca_certificats);
+int  tls_set_config(TLS_config **tls_config, t_tls_setup *tls_setup);
 int  tls_register_sni(t_charlist *hostname, t_tls_setup *tls_setup);
-int  tls_load_key_cert(char *file, mbedtls_pk_context **private_key, mbedtls_x509_crt **certificate);
-int  tls_load_ca_cert(char *file, mbedtls_x509_crt **ca_certificate);
-int  tls_load_ca_crl(char *file, mbedtls_x509_crl **ca_crl);
-int  tls_load_ca_root_certs(char *source, mbedtls_x509_crt **ca_root_certs);
-int  tls_accept(int *sock, mbedtls_ssl_context *context, mbedtls_ssl_config *config, int timeout);
-int  tls_pending(mbedtls_ssl_context *context);
-int  tls_receive(mbedtls_ssl_context *context, char *buffer, unsigned int maxlength);
-int  tls_send(mbedtls_ssl_context *context, const char *buffer, unsigned int length);
-bool tls_has_peer_cert(mbedtls_ssl_context *context);
-int  tls_get_peer_cert_info(mbedtls_ssl_context *context, char *subject_dn, char *issuer_dn, char *serial_nr, int length);
-char *tls_version_string(mbedtls_ssl_context *context);
-char *tls_cipher_string(mbedtls_ssl_context *context);
-void tls_close(mbedtls_ssl_context *context);
-int  tls_connect(mbedtls_ssl_context *context, int *sock, char *hostname);
-int  tls_send_buffer(mbedtls_ssl_context *context, const char *buffer, int size);
+int  tls_load_key_cert(char *file, TLS_key **private_key, TLS_cert **certificate);
+int  tls_load_ca_cert(char *file, TLS_cert **ca_certificate);
+int  tls_load_ca_crl(char *file, TLS_crl **ca_crl);
+int  tls_load_ca_root_certs(char *source, TLS_cert **ca_root_certs);
+int  tls_accept(int *sock, TLS_context *context, TLS_config *config, int timeout);
+int  tls_pending(TLS_context *context);
+int  tls_receive(TLS_context *context, char *buffer, unsigned int maxlength);
+int  tls_send(TLS_context *context, const char *buffer, unsigned int length);
+bool tls_has_peer_cert(TLS_context *context);
+int  tls_get_peer_cert_info(TLS_context *context, char *subject_dn, char *issuer_dn, char *serial_nr, int length);
+char *tls_version_string(TLS_context *context);
+char *tls_cipher_string(TLS_context *context);
+void tls_close(TLS_context *context);
+int  tls_connect(TLS_context *context, int *sock, char *hostname);
+int  tls_send_buffer(TLS_context *context, const char *buffer, int size);
 int  create_hpkp_header(t_hpkp_data *hpkp_data);
 #ifdef ENABLE_HTTP2
-int tls_accept_http2(mbedtls_ssl_config *config);
-bool tls_http2_accepted(mbedtls_ssl_context *context);
+int tls_accept_http2(TLS_config *config);
+bool tls_http2_accepted(TLS_context *context);
 #endif
 
 #endif
