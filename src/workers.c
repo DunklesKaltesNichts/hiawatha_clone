@@ -43,9 +43,7 @@ extern char *hs_conlen;
 char *fb_filesystem      = "access denied via filesystem";
 char *fb_accesslist      = "access denied via accesslist";
 char *unknown_host       = "(unknown)";
-#ifdef ENABLE_CHALLENGE
 volatile bool challenge_client_mode = false;
-#endif
 
 #ifdef ENABLE_THREAD_POOL
 typedef struct type_thread_pool {
@@ -485,7 +483,6 @@ tunnel_ssh:
 	}
 #endif
 
-#ifdef ENABLE_CHALLENGE
 	/* Challenge client
 	 */
 	if (session->config->challenge_threshold >= 0) {
@@ -525,7 +522,6 @@ tunnel_ssh:
 			}
 		}
 	}
-#endif
 
 	/* Find host record
 	 */

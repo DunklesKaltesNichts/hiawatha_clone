@@ -85,7 +85,6 @@
 				printf(" - Hostname %s in URL does not match.\n");
 				return false;
 			}
-			#list($path) = explode(">", $path, 2);
 
 			return "/".$path;
 		}
@@ -170,7 +169,9 @@
 
 			if ($result["status"] != $expected_status) {
 				if (($body = json_decode($result["body"], true)) !== null) {
-					printf(" - %s\n", $body["detail"]);
+					if (isset($body["detail"])) {
+						printf(" - %s\n", $body["detail"]);
+					}
 				}
 				return false;
 			}
@@ -190,26 +191,15 @@
 				"termsOfServiceAgreed" => true);
 
 			if (($result = $this->POST("/acme/new-acct", $payload, 201)) == false) {
-				if (($this->last_result["status"] == 200) && ($this->account_id == 0) &&
-				    (isset($this->last_result["headers"]["location"]))) {
-					/* Key already registered, but ID missing in key file.
-					 */
-					$this->logfile->clean();
-
-					$parts = explode("/", $this->last_result["headers"]["location"]);
-					return -(int)array_pop($parts); 
-				}
-
 				return false;
 			}
 
-			if (($body = json_decode($result["body"], true)) === null) {
-				return false;
-			}
+			$parts = explode("/", $this->last_result["headers"]["location"]);
+			$account_id = (int)array_pop($parts); 
 
 			$this->logfile->clean();
 
-			return $body["id"];
+			return $account_id;
 		}
 
 		/* Order certificate
@@ -243,8 +233,7 @@
 			}
 
 			foreach ($body["identifiers"] as $i => $identifier) {
-				list(,,,,, $authorization) = explode("/", $body["authorizations"][$i], 6);
-				$body["identifiers"][$i]["authorization"] = $authorization;
+				$body["identifiers"][$i]["path"] = $this->get_path($body["authorizations"][$i]);
 			}
 
 			return array(
@@ -255,8 +244,7 @@
 		/* Get challenge
 		 */
 		public function get_challenge($order) {
-			$path = "/acme/authz/".$order["authorization"];
-			if (($result = $this->GET($path)) === false) {
+			if (($result = $this->GET($order["path"])) === false) {
 				return false;
 			}
 
@@ -269,7 +257,6 @@
 					continue;
 				}
 
-				list (,,,,, $chal) = explode("/", $challenge["url"], 6);
 				$data = array(
 					"e"   => $this->b64u_encode($this->account_key->e),
 					"kty" => "RSA",
@@ -277,9 +264,9 @@
 				$key = $challenge["token"].".".$this->b64u_encode(hash("sha256", json_encode($data), true));
 
 				return array(
-					"challenge" => $chal,
-					"key"       => $key,
-					"token"     => $challenge["token"]);
+					"path"  => $this->get_path($challenge["url"]),
+					"key"   => $key,
+					"token" => $challenge["token"]);
 			}
 
 			printf(" - No HTTP challenge was offered.\n");
@@ -289,9 +276,8 @@
 		/* Authorize host
 		 */
 		public function authorize_host($challenge) {
-			$path = "/acme/challenge/".$challenge["challenge"];
 			$payload = array("keyAuthorization" => $challenge["key"]);
-			if (($result = $this->POST($path, $payload)) == false) {
+			if (($result = $this->POST($challenge["path"], $payload)) == false) {
 				return false;
 			}
 
@@ -301,9 +287,7 @@
 		/* Poll authorization is valid
 		 */
 		public function authorization_valid($order) {
-			$path = "/acme/authz/".$order["authorization"];
-
-			if (($result = $this->GET($path)) === false) {
+			if (($result = $this->GET($order["path"])) === false) {
 				return false;
 			}
 
@@ -342,7 +326,7 @@
 			return array(
 				"status"   => $body["status"],
 				"location" => $this->get_path($result["headers"]["location"]),
-				"download" => $this->get_path($body["certificate"]));
+				"path"     => $this->get_path($body["certificate"]));
 		}
 
 		/* Poll certificate is ready
@@ -366,7 +350,7 @@
 		/* Get certificate
 		 */
 		public function get_certificate($certificate) {
-			if (($result = $this->GET($certificate)) == false) {
+			if (($result = $this->GET($certificate["path"])) == false) {
 				return false;
 			}
 

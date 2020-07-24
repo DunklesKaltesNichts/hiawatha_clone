@@ -312,10 +312,8 @@ t_accesslist *parse_accesslist(char *line, bool pwd_allowed, t_accesslist *list)
 					 */
 					if (new->ip.family == AF_INET) {
 						new->netmask = 8 * IPv4_LEN;
-#ifdef ENABLE_IPV6
 					} else if (new->ip.family == AF_INET6) {
 						new->netmask = 8 * IPv6_LEN;
-#endif
 					} else {
 						error = true;
 						break;
@@ -328,13 +326,11 @@ t_accesslist *parse_accesslist(char *line, bool pwd_allowed, t_accesslist *list)
 							error = true;
 							break;
 						}
-#ifdef ENABLE_IPV6
 					} else if (new->ip.family == AF_INET6) {
 						if ((unsigned int)new->netmask > 8 * IPv6_LEN) {
 							error = true;
 							break;
 						}
-#endif
 					} else {
 						error = true;
 						break;

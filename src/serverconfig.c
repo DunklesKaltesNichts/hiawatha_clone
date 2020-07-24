@@ -169,9 +169,7 @@ static t_host *new_host(void) {
 	host->monitor_host_stats  = NULL;
 	host->monitor_host        = false;
 #endif
-#ifdef ENABLE_FILEHASHES
 	host->file_hashes         = NULL;
-#endif
 	host->websockets          = NULL;
 	init_charlist(&(host->skip_cache_cookies));
 
@@ -374,11 +372,8 @@ t_config *default_config(void) {
 		parse_charlist(gzip_ext, &(config->gzip_extensions));
 		free(gzip_ext);
 	}
-
-#ifdef ENABLE_CHALLENGE
 	config->challenge_threshold = -1;
 	config->challenge_secret   = NULL;
-#endif
 
 #ifdef ENABLE_TOOLKIT
 	config->url_toolkit        = NULL;
@@ -953,10 +948,12 @@ next_host:
 				found = false;
 
 				while (directory != NULL) {
-					if (strcmp(host->directory_str.item[i], directory->dir_id) == 0) {
-						host->directory[i] = directory;
-						found = true;
-						break;
+					if (directory->dir_id != NULL) {
+						if (strcmp(host->directory_str.item[i], directory->dir_id) == 0) {
+							host->directory[i] = directory;
+							found = true;
+							break;
+						}
 					}
 
 					directory = directory->next;
@@ -1143,7 +1140,6 @@ static bool system_setting(char *key, char *value, t_config *config) {
 		if ((config->cgi_wrapper = strdup(value)) != NULL) {
 			return true;
 		}
-#ifdef ENABLE_CHALLENGE
 	} else if (strcmp(key, "challengeclient") == 0) {
 		if (split_string(value, &value, &rest, ',') != 0) {
 			return false;
@@ -1170,7 +1166,6 @@ static bool system_setting(char *key, char *value, t_config *config) {
 			}
 			return true;
 		}
-#endif
 	} else if (strcmp(key, "connectionsperip") == 0) {
 		if ((config->connections_per_ip = str_to_int(value)) > 0) {
 			return true;
@@ -1759,12 +1754,10 @@ static bool host_setting(char *key, char *value, t_host *host) {
 		if (parse_yesno(value, &(host->execute_cgi)) == 0) {
 			return true;
 		}
-#ifdef ENABLE_FILEHASHES
 	} else if (strcmp(key, "filehashes") == 0) {
 		if ((host->file_hashes = read_file_hashes(value)) != NULL) {
 			return true;
 		}
-#endif
 	} else if (strcmp(key, "followsymlinks") == 0) {
 		if (parse_yesno(value, &(host->follow_symlinks)) == 0) {
 			return true;

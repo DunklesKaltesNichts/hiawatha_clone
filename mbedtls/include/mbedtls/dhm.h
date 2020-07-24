@@ -336,6 +336,8 @@ int mbedtls_dhm_parse_dhmfile( mbedtls_dhm_context *dhm, const char *path );
 #endif /* MBEDTLS_FS_IO */
 #endif /* MBEDTLS_ASN1_PARSE_C */
 
+#if defined(MBEDTLS_SELF_TEST)
+
 /**
  * \brief          The DMH checkup routine.
  *
@@ -344,6 +346,7 @@ int mbedtls_dhm_parse_dhmfile( mbedtls_dhm_context *dhm, const char *path );
  */
 int mbedtls_dhm_self_test( int verbose );
 
+#endif /* MBEDTLS_SELF_TEST */
 #ifdef __cplusplus
 }
 #endif

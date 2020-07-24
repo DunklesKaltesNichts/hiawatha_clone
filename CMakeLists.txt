@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(Hiawatha VERSION 10.9 LANGUAGES C)
+project(Hiawatha VERSION 10.10 LANGUAGES C)
 
 # Compiler
 set(CMAKE_C_FLAGS "-O2 -Wall -Wextra ${CMAKE_C_FLAGS}")
@@ -8,7 +8,6 @@ set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 # Options
 option(ENABLE_CACHE    "Enable cache support in Hiawatha." on)
 #option(ENABLE_HTTP2    "Enable HTTP2 support in Hiawatha." off)
-option(ENABLE_IPV6     "Enable IPv6 support in Hiawatha." on)
 option(ENABLE_MONITOR  "Enable support for the Hiawatha Monitor." off)
 option(ENABLE_RPROXY   "Enable reverse proxy support in Hiawatha." on)
 option(ENABLE_TLS      "Enable TLS (mbed TLS) support in Hiawatha." on)
@@ -17,7 +16,7 @@ option(ENABLE_TOOLKIT  "Enable the URL toolkit in Hiawatha" on)
 option(ENABLE_XSLT     "Enable XSLT support in Hiawatha." on)
 
 option(USE_SYSTEM_MBEDTLS "Use the system's mbed TLS (>=2.0.0) library." off)
-option(USE_SYSTEM_NGHTTP2 "Use the system's nghttp2 library." off)
+#option(USE_SYSTEM_NGHTTP2 "Use the system's nghttp2 library." off)
 
 # Includes
 include(CMakeFiles.txt)

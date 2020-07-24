@@ -79,20 +79,11 @@ char *enabled_modules = ""
 #ifdef ENABLE_CACHE
 	", Cache"
 #endif
-#ifdef ENABLE_CHALLENGE
-	", ChallengeClient"
-#endif
 #ifdef ENABLE_DEBUG
 	", debug"
 #endif
-#ifdef ENABLE_FILEHASHES
-	", FileHashes"
-#endif
 #ifdef ENABLE_HTTP2
 	", HTTP/2"
-#endif
-#ifdef ENABLE_IPV6
-	", IPv6"
 #endif
 #ifdef ENABLE_MONITOR
 	", Monitor"
@@ -102,9 +93,6 @@ char *enabled_modules = ""
 #endif
 #ifdef ENABLE_TLS
 	", TLS v"MBEDTLS_VERSION_STRING
-#endif
-#ifdef ENABLE_THREAD_POOL
-	", ThreadPool"
 #endif
 #ifdef ENABLE_TOMAHAWK
 	", Tomahawk"
@@ -271,10 +259,8 @@ void task_runner(t_config *config) {
 			case rs_UNBAN_CLIENTS:
 				default_ipv4(&ip_addr);
 				unban_ip(&ip_addr);
-#ifdef ENABLE_IPV6
 				default_ipv6(&ip_addr);
 				unban_ip(&ip_addr);
-#endif
 				received_signal = rs_NONE;
 				break;
 			case rs_UNLOCK_LOGFILES:
@@ -327,17 +313,11 @@ void USR2_handler() {
 int bind_sockets(t_binding *binding) {
 	char ip_address[MAX_IP_STR_LEN], separator;
 	struct sockaddr_in  saddr4;
-#ifdef ENABLE_IPV6
 	struct sockaddr_in6 saddr6;
-#endif
 	int domain, optval, result;
 
 	while (binding != NULL) {
-#ifdef ENABLE_IPV6
 		domain = (binding->interface.family == AF_INET ? PF_INET : PF_INET6);
-#else
-		domain = PF_INET;
-#endif
 		if ((binding->socket = socket(domain, SOCK_STREAM, 0)) == -1) {
 			perror("socket()");
 			return -1;
@@ -364,7 +344,6 @@ int bind_sockets(t_binding *binding) {
 			result = bind(binding->socket, (struct sockaddr*)&saddr4, sizeof(struct sockaddr_in));
 
 			separator = ':';
-#ifdef ENABLE_IPV6
 		} else if (binding->interface.family == AF_INET6) {
 			/* IPv6
 			 */
@@ -381,7 +360,6 @@ int bind_sockets(t_binding *binding) {
 			result = bind(binding->socket, (struct sockaddr*)&saddr6, sizeof(struct sockaddr_in6));
 
 			separator = '.';
-#endif
 		} else {
 			fprintf(stderr, "Unknown protocol (family %d).\n", binding->interface.family);
 			return -1;
@@ -410,9 +388,7 @@ int accept_connection(t_binding *binding, t_config *config) {
 	bool                kick_client;
 	t_session           *session;
 	struct sockaddr_in  caddr4;
-#ifdef ENABLE_IPV6
 	struct sockaddr_in6 caddr6;
-#endif
 	int                 optval, connections_per_ip, total_connections;
 	struct timeval      timer;
 #ifdef ENABLE_DEBUG
@@ -447,7 +423,6 @@ int accept_connection(t_binding *binding, t_config *config) {
 		session->ip_address.family = AF_INET;
 		session->ip_address.size   = IPv4_LEN;
 		memcpy(&(session->ip_address.value), (char*)&caddr4.sin_addr.s_addr, session->ip_address.size);
-#ifdef ENABLE_IPV6
 	} else if (binding->interface.family == AF_INET6) {
 		/* IPv6
 		 */
@@ -465,7 +440,6 @@ int accept_connection(t_binding *binding, t_config *config) {
 		session->ip_address.family = AF_INET6;
 		session->ip_address.size   = IPv6_LEN;
 		memcpy(&(session->ip_address.value), (char*)&caddr6.sin6_addr.s6_addr, session->ip_address.size);
-#endif
 	} else {
 		log_system_session(session, "Incoming connection via unknown protocol");
 		free(session);
@@ -738,6 +712,7 @@ int run_webserver(t_settings *settings) {
 	 */
 	tzset();
 	clearenv();
+	umask(0117);
 
 	/* Become a daemon
 	 */
@@ -942,12 +917,10 @@ int run_webserver(t_settings *settings) {
 #ifdef ENABLE_MEMDBG
 	init_memdbg();
 #endif
-#ifdef ENABLE_CHALLENGE
 	if (init_challenge_module(config->challenge_secret) == -1) {
 		fprintf(stderr, "Error initializing ChallengeClient module.\n");
 		return -1;
 	}
-#endif
 
 #ifdef HAVE_ACCF
 	binding = config->binding;

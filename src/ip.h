@@ -24,14 +24,9 @@
 #include <sys/socket.h>
 
 #define IPv4_LEN sizeof(struct in_addr)
-#ifdef ENABLE_IPV6
 #define IPv6_LEN sizeof(struct in6_addr)
 #define MAX_IP_LEN IPv6_LEN
 #define MAX_IP_STR_LEN INET6_ADDRSTRLEN
-#else
-#define MAX_IP_LEN IPv4_LEN
-#define MAX_IP_STR_LEN INET_ADDRSTRLEN
-#endif
 
 typedef unsigned long t_ipv4;
 
@@ -49,9 +44,7 @@ typedef struct type_iplist {
 } t_iplist;
 
 int  default_ipv4(t_ip_addr *ip_addr);
-#ifdef ENABLE_IPV6
 int  default_ipv6(t_ip_addr *ip_addr);
-#endif
 int  set_localhost_ipv4(t_ip_addr *ip_addr);
 int  set_localhost_ipv6(t_ip_addr *ip_addr);
 int  parse_ip(char *str, t_ip_addr *ip_addr);

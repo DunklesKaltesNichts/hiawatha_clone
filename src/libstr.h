@@ -18,6 +18,7 @@
 #include <regex.h>
 
 #define CHECK_USE_STRLEN -1
+#define str_to_off str_to_int
 
 void check_free(void *ptr);
 void clear_free(void *ptr, int size);

@@ -18,7 +18,6 @@
 /* Hiawatha modules
  */
 #cmakedefine ENABLE_CACHE ${ENABLE_CACHE}
-#cmakedefine ENABLE_IPV6 ${ENABLE_IPV6}
 #cmakedefine ENABLE_LOADCHECK ${ENABLE_LOADCHECK}
 #cmakedefine ENABLE_MONITOR ${ENABLE_MONITOR}
 #cmakedefine ENABLE_RPROXY ${ENABLE_RPROXY}
@@ -29,9 +28,7 @@
 
 /* Other Hiawatha features
  */
-#define ENABLE_CHALLENGE ON
 //#define ENABLE_DEBUG ON
-#define ENABLE_FILEHASHES ON
 //#define ENABLE_MEMDBG ON
 #define ENABLE_THREAD_POOL ON
 

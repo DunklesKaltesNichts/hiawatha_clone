@@ -35,6 +35,12 @@
 #ifndef MBEDTLS_GCM_H
 #define MBEDTLS_GCM_H
 
+#if !defined(MBEDTLS_CONFIG_FILE)
+#include "config.h"
+#else
+#include MBEDTLS_CONFIG_FILE
+#endif
+
 #include "cipher.h"
 
 #include <stdint.h>
@@ -302,6 +308,8 @@ int mbedtls_gcm_finish( mbedtls_gcm_context *ctx,
  */
 void mbedtls_gcm_free( mbedtls_gcm_context *ctx );
 
+#if defined(MBEDTLS_SELF_TEST)
+
 /**
  * \brief          The GCM checkup routine.
  *
@@ -309,6 +317,8 @@ void mbedtls_gcm_free( mbedtls_gcm_context *ctx );
  * \return         \c 1 on failure.
  */
 int mbedtls_gcm_self_test( int verbose );
+
+#endif /* MBEDTLS_SELF_TEST */
 
 #ifdef __cplusplus
 }

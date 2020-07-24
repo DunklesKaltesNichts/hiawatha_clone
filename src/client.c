@@ -552,12 +552,10 @@ int unban_ip(t_ip_addr *ip) {
 	 */
 	default_ipv4(&any);
 	any_ip = same_ip(ip, &any);
-#ifdef ENABLE_IPV6
 	if (any_ip == false) {
 		default_ipv6(&any);
 		any_ip = same_ip(ip, &any);
 	}
-#endif
 
 	pthread_mutex_lock(&ban_mutex);
 

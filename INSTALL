@@ -17,7 +17,6 @@ Use the following commands to compile and install Hiawatha. This will install Hi
 The following options for cmake are available. Default value is in uppercase.
 
 	-DENABLE_CACHE=ON|off              Enable internal cache support.
-	-DENABLE_IPV6=ON|off               Enable IPv6 support.
 	-DENABLE_MONITOR=on|OFF            Enable support for the Hiawatha Monitor.
 	-DENABLE_RPROXY=ON|off             Enable reverse proxy support.
 	-DENABLE_TLS=ON|off                Enable TLS (mbed TLS) support.
@@ -32,7 +31,7 @@ The following path settings are available for cmake.
 	-DCMAKE_INSTALL_BINDIR=<path>      Location of the ssi-cgi binary.
 	-DCMAKE_INSTALL_SBINDIR=<path>     Location of the other Hiawatha binaries.
 	-DCMAKE_INSTALL_SYSCONFDIR=<path>  The configuration files will be installed in <path>/hiawatha.
-	-DCMAKE_INSTALL_LIBDIR=<p9ath>      The mbed TLS shared library will be installed in <path>/hiawatha.
+	-DCMAKE_INSTALL_LIBDIR=<path>      The mbed TLS shared library will be installed in <path>/hiawatha.
 	-DCMAKE_INSTALL_MANDIR=<path>      Manual pages will be installed in <path>/man1.
 	-DCONFIG_DIR=<path>                Location of the Hiawatha configuration files.
 	-DLOG_DIR=<path>                   Log directory used in the default hiawatha.conf.

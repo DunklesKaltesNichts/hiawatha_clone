@@ -170,7 +170,6 @@ no_gzip:
 		return 403;
 	}
 
-#ifdef ENABLE_FILEHASHES
 	/* File hashes
 	 */
 	if ((session->host->file_hashes != NULL) && (session->letsencrypt_auth_request == false)) {
@@ -186,7 +185,6 @@ no_gzip:
 			return 403;
 		}
 	}
-#endif
 
 	/* Symlink check
 	 */
@@ -278,9 +276,9 @@ no_gzip:
 
 			if (split_string(range, &range_begin, &range_end, '-') == 0) {
 				if (*range_begin != '\0') {
-					if ((send_begin = str_to_int(range_begin)) >= 0) {
+					if ((send_begin = str_to_off(range_begin)) >= 0) {
 						if (*range_end != '\0') {
-							if ((send_end = str_to_int(range_end)) >= 0) {
+							if ((send_end = str_to_off(range_end)) >= 0) {
 								/* bytes=XX-XX */
 								session->return_code = 206;
 							}
@@ -290,7 +288,7 @@ no_gzip:
 						}
 					}
 				} else {
-					if ((send_begin = str_to_int(range_end)) >= 0) {
+					if ((send_begin = str_to_off(range_end)) >= 0) {
 						/* bytes=-XX */
 						send_begin = file_size - send_begin - 1;
 						session->return_code = 206;
@@ -585,7 +583,6 @@ int execute_cgi(t_session *session) {
 			close(handle);
 		}
 
-#ifdef ENABLE_FILEHASHES
 		/* File hashes
 		 */
 		if (session->host->file_hashes != NULL) {
@@ -600,7 +597,6 @@ int execute_cgi(t_session *session) {
 				return 403;
 			}
 		}
-#endif
 	}
 
 	if (session->host->execute_cgi == false) {

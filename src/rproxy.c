@@ -185,7 +185,6 @@ t_rproxy *rproxy_setting(char *line) {
 
 		/* Port
 		 */
-#ifdef ENABLE_IPV6
 		if (*line == '[') {
 			line++;
 			if ((port = strchr(line, ']')) == NULL) {
@@ -201,9 +200,9 @@ t_rproxy *rproxy_setting(char *line) {
 				free(rproxy);
 				return NULL;
 			}
-		} else
-#endif
+		} else {
 			port = strchr(line, ':');
+		}
 
 		if (port != NULL) {
 			*(port++) = '\0';

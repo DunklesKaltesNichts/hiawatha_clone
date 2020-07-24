@@ -15,11 +15,7 @@
 #include "config.h"
 #include "global.h"
 
-#ifdef ENABLE_CHALLENGE
-
 int init_challenge_module(char *challenge_secret);
 int challenge_client(t_session *session);
-
-#endif
 
 #endif

@@ -1,3 +1,12 @@
+hiawatha (10.10) stable; urgency=low
+
+  * Removed several build options. Functionalities are now always enabled.
+  * mbed TLS updated to 2.16.3.
+  * Updated Let's Encrypt script due to changes in the API.
+  * Bugfix: AlterMode not working correctly.
+
+ -- Hugo Leisink <hugo@leisink.net>  Thu, 19 Sep 2019 20:33:21 +0200
+
 hiawatha (10.9) stable; urgency=low
 
   * Let's Encrypt script installed via CMake.

@@ -14,7 +14,10 @@ mbedtls_disable() {
 	perl -pi -e "s/^#define ${1}$/\/\/#define ${1}/" include/mbedtls/config.h
 }
 
-cd `dirname $0`
+if [ ! `which curl` ]; then
+	echo "Curl not found."
+	exit
+fi
 
 version=`curl -s https://tls.mbed.org/download/latest-stable-version`
 current=`grep "^=" ChangeLog | head -1 | cut -f4 -d' '`

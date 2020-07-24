@@ -56,7 +56,9 @@
 		/* Clear the output buffer
 		 */
 		public function clean() {
-			$this->entries = array();
+			if (DEBUG != "yes") {
+				$this->entries = array();
+			}
 		}
 
 		/* Add item to output buffer

@@ -38,7 +38,6 @@ int default_ipv4(t_ip_addr *ip_addr) {
 	return 0;
 }
 
-#ifdef ENABLE_IPV6
 int default_ipv6(t_ip_addr *ip_addr) {
 	/* set to ::
 	 */
@@ -52,7 +51,6 @@ int default_ipv6(t_ip_addr *ip_addr) {
 
 	return 0;
 }
-#endif
 
 int set_localhost_ipv4(t_ip_addr *ip_addr) {
 	if (ip_addr == NULL) {
@@ -78,11 +76,9 @@ int parse_ip(char *str, t_ip_addr *ip_addr) {
 	if (inet_pton(AF_INET, str, ip_addr->value) > 0) {
 		ip_addr->family = AF_INET;
 		ip_addr->size = IPv4_LEN;
-#ifdef ENABLE_IPV6
 	} else if (inet_pton(AF_INET6, str, ip_addr->value) > 0) {
 		ip_addr->family = AF_INET6;
 		ip_addr->size = IPv6_LEN;
-#endif
 	} else {
 		ip_addr->family = AF_UNSPEC;
 		ip_addr->size = 0;
@@ -138,11 +134,9 @@ int apply_netmask(t_ip_addr *ip, int mask) {
 	} else if (ip->family == AF_INET) {
 		byte = IPv4_LEN - 1;
 		mask = (8 * IPv4_LEN) - mask;
-#ifdef ENABLE_IPV6
 	} else if (ip->family == AF_INET6) {
 		byte = IPv6_LEN - 1;
 		mask = (8 * IPv6_LEN) - mask;
-#endif
 	} else {
 		return -1;
 	}
@@ -187,16 +181,13 @@ int parse_ip_port(char *line, t_ip_addr *ip, int *port) {
 		return -1;
 	}
 
-#ifdef ENABLE_IPV6
 	if (split_string(line, &s_ip, &s_port, ']') == 0) {
 		if ((*s_ip != '[') || (*s_port != ':')) {
 			return -1;
 		}
 		s_ip = remove_spaces(s_ip + 1);
 		s_port = remove_spaces(s_port + 1);
-	} else
-#endif
-	{
+	} else {
 		s_port = line + strlen(line);
 		do {
 			if (s_port <= line) {
@@ -220,11 +211,9 @@ int parse_ip_port(char *line, t_ip_addr *ip, int *port) {
 		if ((ip->family == AF_INET) && (sep != ':')) {
 			return -1;
 		}
-#ifdef ENABLE_IPV6
 		if ((ip->family == AF_INET6) && (sep != '.')) {
 			return -1;
 		}
-#endif
 	}
 
 	return 0;
@@ -254,10 +243,8 @@ int anonymized_ip_to_str(t_ip_addr *ip, char *str, int max_len) {
 		return -1;
 	} else if (ip->family == AF_INET) {
 		mask = 24;
-#ifdef ENABLE_IPV6
 	} else if (ip->family == AF_INET6) {
 		mask = 48;
-#endif
 	} else {
 		strncpy(str, unknown_ip, max_len);
 		str[max_len - 1] = '\0';
@@ -290,11 +277,9 @@ int hostname_to_ip(char *hostname, t_ip_addr *ip) {
 	if (addrinfo->ai_family == AF_INET) {
 		ip->size = IPv4_LEN;
 		memcpy(&ip->value, &((struct sockaddr_in*)(addrinfo->ai_addr))->sin_addr, ip->size);
-#ifdef ENABLE_IPV6
 	} else if (addrinfo->ai_family == AF_INET6) {
 		ip->size = IPv6_LEN;
 		memcpy(&ip->value, &((struct sockaddr_in6*)(addrinfo->ai_addr))->sin6_addr, ip->size);
-#endif
 	} else {
 		freeaddrinfo(addrinfo);
 		return -1;
@@ -336,10 +321,8 @@ int parse_iplist(char *line, t_iplist **list) {
 			}
 		} else if (new->ip.family == AF_INET) {
 			new->netmask = 8 * IPv4_LEN;
-#ifdef ENABLE_IPV6
 		} else if (new->ip.family == AF_INET6) {
 			new->netmask = 8 * IPv6_LEN;
-#endif
 		} else {
 			error = true;
 			break;
@@ -382,9 +365,7 @@ void remove_iplist(t_iplist *list) {
 int connect_to_server(t_ip_addr *ip_addr, int port) {
 	int sock = -1;
 	struct sockaddr_in saddr4;
-#ifdef ENABLE_IPV6
 	struct sockaddr_in6 saddr6;
-#endif
 
 	if (ip_addr == NULL) {
 		return -1;
@@ -403,7 +384,6 @@ int connect_to_server(t_ip_addr *ip_addr, int port) {
 				sock = -1;
 			}
 		}
-#ifdef ENABLE_IPV6
 	} else if (ip_addr->family == AF_INET6) {
 		/* IPv6
 		 */
@@ -417,7 +397,6 @@ int connect_to_server(t_ip_addr *ip_addr, int port) {
 				sock = -1;
 			}
 		}
-#endif
 	}
 
 	return sock;

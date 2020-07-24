@@ -561,7 +561,6 @@ int remove_port_from_hostname(t_session *session) {
 		return -1;
 	}
 
-#ifdef ENABLE_IPV6
 	if (session->binding->interface.family == AF_INET6) {
 		if ((*(session->hostname) == '[') && ((c = strchr(session->hostname, ']')) != NULL)) {
 			c++;
@@ -581,7 +580,6 @@ int remove_port_from_hostname(t_session *session) {
 			return 0;
 		}
 	}
-#endif
 
 	if ((c = strrchr(session->hostname, ':')) != NULL) {
 		if (c == session->hostname) {

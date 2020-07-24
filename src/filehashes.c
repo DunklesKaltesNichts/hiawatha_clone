@@ -11,8 +11,6 @@
 
 #include "config.h"
 
-#ifdef ENABLE_FILEHASHES
-
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -218,5 +216,3 @@ hash_fail:
 
 	return result;
 }
-
-#endif

@@ -370,10 +370,8 @@ static int run_tomahawk(char *line, t_admin *admin, t_config *config) {
 		} else if (strcmp(param, "all") == 0) {
 			default_ipv4(&ip);
 			count = unban_ip(&ip);
-#ifdef ENABLE_IPV6
 			default_ipv6(&ip);
 			count += unban_ip(&ip);
-#endif
 			fprintf(fp, "  %d IPs have been unbanned.\n", count);
 		} else if (parse_ip(param, &ip) == -1) {
 			fprintf(fp, "  invalid IP!\n");

@@ -1,0 +1,112 @@
+#!/bin/bash
+
+whiptail -v > /dev/null 2> /dev/null
+if [ $? != 0 ]; then
+	echo "This compile script requires whiptail."
+	exit;
+fi
+
+cd `dirname $0`
+version=`grep ^project CMakeLists.txt | cut -f3 -d' '`
+
+function custom_compile {
+	options=$(whiptail \
+		--backtitle "Hiawatha v${version}" \
+		--title "Select compiler options" \
+		--clear --notags \
+		--cancel-button "Exit" \
+		--checklist "" 0 0 0 \
+    	"+DENABLE_CACHE=on"    "Enable internal cache support." ON \
+		"+DENABLE_MONITOR=on"  "Enable support for the Hiawatha Monitor." OFF \
+		"+DENABLE_RPROXY=on"   "Enable reverse proxy support." ON \
+		"+DENABLE_TLS=on"      "Enable TLS (mbed TLS) support." ON \
+		"+DENABLE_TOMAHAWK=on" "Enable Tomahawk, the Hiawatha command shell." OFF \
+		"+DENABLE_TOOLKIT=on"  "Enable the URL Toolkit." ON \
+		"+DENABLE_XSLT=on"     "Enable XSLT support." ON \
+		3>&1 1>&2 2>&3)
+
+	if [ $? = 1 ]; then
+		exit
+	fi
+
+	while [ "${settings}" != "COMPILE" ]; do
+		settings=$(whiptail \
+			--backtitle "Hiawatha v${version}" \
+			--title "Select compiler setting" \
+			--clear --notags \
+			--cancel-button "Exit" \
+			--menu "" 0 0 0 \
+			"DCMAKE_INSTALL_PREFIX"     "The prefix for all other CMAKE_INSTALL directories." \
+			"DCMAKE_INSTALL_BINDIR"     "Location of the ssi-cgi binary." \
+			"DCMAKE_INSTALL_SBINDIR"    "Location of the other Hiawatha binaries." \
+			"DCMAKE_INSTALL_SYSCONFDIR" "The configuration files will be installed in <path>/hiawatha." \
+			"DCMAKE_INSTALL_LIBDIR"     "The mbed TLS shared library will be installed in <path>/hiawatha." \
+			"DCMAKE_INSTALL_MANDIR"     "Manual pages will be installed in <path>/man1." \
+			"DCONFIG_DIR"               "Location of the Hiawatha configuration files." \
+			"DLOG_DIR"                  "Log directory used in the default hiawatha.conf." \
+			"DPID_DIR"                  "Location of the Hiawatha PID file." \
+			"DWEBROOT_DIR"              "Webroot directory used in the default hiawatha.conf." \
+			"DWORK_DIR"                 "Path of directory where Hiawatha can write temporary files." \
+			"" "" \
+			"COMPILE"                   "Compile Hiawatha" \
+			3>&1 1>&2 2>&3)
+
+		if [ $? = 1 ]; then
+			exit
+		fi
+	done
+exit
+
+
+	params=`echo ${options} | tr '+"' '- '`
+	rm -rf build
+	mkdir -p build
+	cd build && cmake .. ${params} && make
+
+	return 0
+}
+
+function make_debian_package {
+	./extra/make_debian_package
+}
+
+function make_macos_package {
+	./extra/make_macos_package
+}
+
+function make_redhat_package {
+	./extra/make_redhat_package
+}
+
+function make_windows_package {
+	./extra/make_windows_package
+}
+
+function main_menu {
+	choice=$(whiptail \
+		--backtitle "Hiawatha v${version}" \
+		--title "Compile method" \
+		--clear --notags \
+		--cancel-button "Exit" \
+		--menu "" 0 0 0 \
+		"C" "Custom compilation" \
+		"D" "Make Debian package" \
+		"M" "Make Mac OS package" \
+		"R" "Make Red Hat package" \
+		"W" "Make Windows (Cygwin) package" \
+		3>&1 1>&2 2>&3)
+
+	if [ $? = 1 ]; then
+		exit
+	fi
+
+	case ${choice} in
+		"C") custom_compile;;
+		"D") make_debian_package;;
+		"M") make_macos_package;;
+		"R") make_redhat_package;;
+		"W") make_windows_package;;
+	esac
+}
+
+main_menu

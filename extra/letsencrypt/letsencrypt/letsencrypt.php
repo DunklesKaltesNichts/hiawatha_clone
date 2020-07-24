@@ -83,9 +83,6 @@
 			if (($account_id = $this->acme->register_account($email_address)) === false) {
 				printf(" - Account registration failed. Already registered?\n");
 				return false;
-			} else if ($account_id < 0) {
-				$account_id = -$account_id;
-				printf(" - Updating account key for ACMI v2 API.\n");
 			} else {
 				printf(" - Account registered successfully.\n");
 			}
@@ -300,7 +297,7 @@
 			/* Download certificates
 			 */
 			printf("Downloading certificates.\n");
-			if (($certificate = $this->acme->get_certificate($cert_info["download"])) == false) {
+			if (($certificate = $this->acme->get_certificate($cert_info)) == false) {
 				printf(" - Error downloading certificate.\n");
 				return false;
 			}

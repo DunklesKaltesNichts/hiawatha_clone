@@ -172,7 +172,6 @@ int fetch_request(t_session *session) {
 							memcpy(session->uploaded_file, session->config->upload_directory, session->config->upload_directory_len);
 							memcpy(session->uploaded_file + session->config->upload_directory_len, "/upload_XXXXXX", 15);
 
-							umask(S_IWGRP | S_IWOTH);
 							if ((upload_handle = mkstemp(session->uploaded_file)) == -1) {
 								free(session->uploaded_file);
 								session->uploaded_file = NULL;

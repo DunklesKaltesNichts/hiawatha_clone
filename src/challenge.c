@@ -11,8 +11,6 @@
 
 #include "config.h"
 
-#ifdef ENABLE_CHALLENGE
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -267,5 +265,3 @@ int challenge_client(t_session *session) {
 
 	return strcmp_rtap(generated, collected) == 0 ? 0 : 503;
 }
-
-#endif

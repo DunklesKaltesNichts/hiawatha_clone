@@ -91,6 +91,9 @@
 						$hostnames = explode(",", strtolower($param));
 						foreach ($hostnames as $key => $value) {
 							$hostnames[$key] = trim($value);
+							if (filter_var($hostnames[$key], FILTER_VALIDATE_IP) || strpos($hostnames[$key], ".") === FALSE) {
+								unset($hostnames[$key]);
+							}
 						}
 						if ($hostname == null) {
 							$hostname = array_shift($hostnames);
