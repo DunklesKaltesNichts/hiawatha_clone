@@ -23,5 +23,4 @@ RENEWAL_SCRIPT_DIR = scripts
 #
 #LE_CA_HOSTNAME = acme-v02.api.letsencrypt.org		# Production
 LE_CA_HOSTNAME = acme-staging-v02.api.letsencrypt.org	# Testing
-LE_ISSUERS = Let's Encrypt Authority X3 \
-             Let's Encrypt Authority X4
+LE_ISSUERS = R3

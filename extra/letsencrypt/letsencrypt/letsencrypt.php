@@ -13,7 +13,7 @@
 	 */
 
 	class LetsEncrypt {
-		const MAX_POLL_DELAY = 5;
+		const MAX_POLL_DELAY = 10;
 
 		private $account_key = null;
 		private $acme = null;
@@ -216,7 +216,7 @@
 				 */
 				printf("Getting authorization challenge for %s.\n", $identifier["value"]);
 				if (($challenge = $this->acme->get_challenge($identifier)) == false) {
-					printf(" - Error getting challange for %s.\n", $identifier["value"]);
+					printf(" - Error getting challenge for %s.\n", $identifier["value"]);
 					$this->remove_challenge_files($website_root);
 					return false;
 				}

@@ -32,7 +32,7 @@ int init_memdbg(void) {
 		return -1;
 	}
 
-	fprintf(stderr, "Hiawatha v%s MemDbg module activated.\n", VERSION);
+	fprintf(stderr, "MemDbg module activated.\n");
 
 	return 0;
 }
@@ -59,8 +59,9 @@ static void log_alloc(void *ptr, size_t size, char *filename, int line_nr) {
 
 /* Log freeing of memory
  */
-static void log_free(void *ptr, char *filename, int line_nr) {
+static int log_free(void *ptr, char *filename, int line_nr) {
 	t_alloc_log *log, *prev = NULL;
+	int result = 0;
 
 	pthread_mutex_lock(&alloc_log_mutex);
 
@@ -85,9 +86,12 @@ static void log_free(void *ptr, char *filename, int line_nr) {
 
 	if (log == NULL) {
 		fprintf(stderr, "Freeing unallocated memory at %s line %d.\n", filename, line_nr);
+		result = -1;
 	}
 
 	pthread_mutex_unlock(&alloc_log_mutex);
+
+	return result;
 }
 
 /* Clear memory allocation log
@@ -128,8 +132,11 @@ void *memdbg_realloc(void *ptr, size_t size, char *filename, int line_nr) {
 	void *result;
 
 	if (ptr != NULL) {
-		log_free(ptr, filename, line_nr);
+		if (log_free(ptr, filename, line_nr) == -1) {
+			return NULL;
+		}
 	}
+
 	if ((result = realloc(ptr, size)) != NULL) {
 		log_alloc(result, size, filename, line_nr);
 	}
@@ -176,8 +183,9 @@ char *memdbg_strndup(char *str, size_t size, char *filename, int line_nr) {
 /* Free memory
  */
 void memdbg_free(void *ptr, char *filename, int line_nr) {
-	log_free(ptr, filename, line_nr);
-	free(ptr);
+	if (log_free(ptr, filename, line_nr) == 0) {
+		free(ptr);
+	}
 }
 
 /* Print memory allocations

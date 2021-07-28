@@ -129,7 +129,7 @@ void log_pid(t_config *config, pid_t pid, uid_t server_uid) {
  */
 void log_system(t_config *config, char *mesg, ...) {
 	FILE *fp;
-	va_list args;
+	va_list args1, args2;
 	char str[TIMESTAMP_SIZE];
 	char text[256];
 
@@ -139,29 +139,31 @@ void log_system(t_config *config, char *mesg, ...) {
 	
 	print_timestamp(str);
 
-	va_start(args, mesg);
+	va_start(args1, mesg);
+	va_copy(args2, args1);
 
 	if ((fp = fopen(config->system_logfile, "a")) != NULL) {
 		fprintf(fp, "0.0.0.0|%s", str);
-		vfprintf(fp, mesg, args);
+		vfprintf(fp, mesg, args1);
 		fprintf(fp, EOL);
 		fclose(fp);
 	}
 
 	if ((config->syslog & SYSLOG_SYSTEM) > 0) {
-		vsnprintf(text, 255, mesg, args);
+		vsnprintf(text, 255, mesg, args2);
 		text[255] = '\0';
 		syslog(LOG_INFO, "system|%s%s", str, text);
 	}
 
-	va_end(args);
+	va_end(args1);
+	va_end(args2);
 }
 
 /* Log a system message about a session
  */
 void log_system_session(t_session *session, char *mesg, ...) {
 	FILE *fp;
-	va_list args;
+	va_list args1, args2;
 	char str[TIMESTAMP_SIZE + IP_ADDRESS_SIZE + 2];
 	char text[256];
 
@@ -169,7 +171,8 @@ void log_system_session(t_session *session, char *mesg, ...) {
 		return;
 	}
 
-	va_start(args, mesg);
+	va_start(args1, mesg);
+	va_copy(args2, args1);
 
 	ip_to_str(&(session->ip_address), str, IP_ADDRESS_SIZE);
 	strcat(str, "|");
@@ -177,25 +180,26 @@ void log_system_session(t_session *session, char *mesg, ...) {
 
 	if ((fp = fopen(session->config->system_logfile, "a")) != NULL) {
 		fprintf(fp, "%s", str);
-		vfprintf(fp, mesg, args);
+		vfprintf(fp, mesg, args1);
 		fprintf(fp, EOL);
 		fclose(fp);
 	}
 
 	if ((session->config->syslog & SYSLOG_SYSTEM) > 0) {
-		vsnprintf(text, 255, mesg, args);
+		vsnprintf(text, 255, mesg, args2);
 		text[255] = '\0';
 		syslog(LOG_INFO, "system|%s%s", str, text);
 	}
 
-	va_end(args);
+	va_end(args1);
+	va_end(args2);
 }
 
 /* Log an error for a specific file
  */
 void log_error_file(t_session *session, char *file, char *mesg, ...) {
 	FILE *fp;
-	va_list args;
+	va_list args1, args2;
 	char str[TIMESTAMP_SIZE + IP_ADDRESS_SIZE + 2];
 	char text[256];
 
@@ -218,7 +222,8 @@ void log_error_file(t_session *session, char *file, char *mesg, ...) {
 		return;
 	}
 
-	va_start(args, mesg);
+	va_start(args1, mesg);
+	va_copy(args2, args1);
 
 	if (session->config->anonymize_ip) {
 		anonymized_ip_to_str(&(session->ip_address), str, IP_ADDRESS_SIZE);
@@ -235,13 +240,13 @@ void log_error_file(t_session *session, char *file, char *mesg, ...) {
 		} else {
 			fprintf(fp, "%s%s|", str, file);
 		}
-		vfprintf(fp, mesg, args);
+		vfprintf(fp, mesg, args1);
 		fprintf(fp, EOL);
 		fclose(fp);
 	}
 
 	if ((session->config->syslog & SYSLOG_ERROR) > 0) {
-		vsnprintf(text, 255, mesg, args);
+		vsnprintf(text, 255, mesg, args2);
 		text[255] = '\0';
 		if (file == NULL) {
 			syslog(LOG_ERR, "error|%s%s", str, text);
@@ -250,7 +255,8 @@ void log_error_file(t_session *session, char *file, char *mesg, ...) {
 		}
 	}
 
-	va_end(args);
+	va_end(args1);
+	va_end(args2);
 }
 
 /* Log a CGI error.
