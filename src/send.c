@@ -415,14 +415,6 @@ int send_header(t_session *session) {
 			return -1;
 		}
 	}
-
-	/* HTTP Public Key Pinning
-	 */
-	if (session->binding->use_tls && (session->host->hpkp_data != NULL)) {
-		if (session->host->hpkp_data->http_header != NULL) {
-			send_buffer(session, session->host->hpkp_data->http_header, session->host->hpkp_data->header_size);
-		}
-	}
 #endif
 
 	return 0;

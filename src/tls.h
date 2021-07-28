@@ -43,7 +43,6 @@ typedef struct {
 	TLS_cert *certificate;
 	TLS_cert *ca_certificate;
 	TLS_crl  *ca_crl;
-	int      min_tls_version;
 	int      dh_size;
 } t_tls_setup;
 
@@ -75,11 +74,6 @@ void tls_close(TLS_context *context);
 int  tls_connect(TLS_context *context, int *sock, char *hostname);
 int  tls_send_buffer(TLS_context *context, const char *buffer, int size);
 int  create_hpkp_header(t_hpkp_data *hpkp_data);
-#ifdef ENABLE_HTTP2
-int tls_accept_http2(TLS_config *config);
-bool tls_http2_accepted(TLS_context *context);
-#endif
-
 #endif
 
 #endif

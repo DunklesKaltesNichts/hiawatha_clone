@@ -143,10 +143,6 @@ typedef struct type_session {
 	TLS_context     rproxy_tls;
 #endif
 #endif
-
-#ifdef ENABLE_HTTP2
-	bool            use_http2;
-#endif
 } t_session;
 
 void init_session(t_session *session);

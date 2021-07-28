@@ -82,9 +82,6 @@ char *enabled_modules = ""
 #ifdef ENABLE_DEBUG
 	", debug"
 #endif
-#ifdef ENABLE_HTTP2
-	", HTTP/2"
-#endif
 #ifdef ENABLE_MONITOR
 	", Monitor"
 #endif
@@ -92,7 +89,7 @@ char *enabled_modules = ""
 	", ReverseProxy"
 #endif
 #ifdef ENABLE_TLS
-	", TLS v"MBEDTLS_VERSION_STRING
+	", mbed TLS v"MBEDTLS_VERSION_STRING
 #endif
 #ifdef ENABLE_TOMAHAWK
 	", Tomahawk"
@@ -599,7 +596,6 @@ int run_webserver(t_settings *settings) {
 		return -1;
 	}
 
-	tls_setup.min_tls_version = config->min_tls_version;
 	tls_setup.dh_size         = config->dh_size;
 #endif
 
@@ -632,12 +628,6 @@ int run_webserver(t_settings *settings) {
 			if (tls_set_config(&(binding->tls_config), &tls_setup) != 0) {
 				return -1;
 			}
-
-#ifdef ENABLE_HTTP2
-			if (binding->use_tls && binding->accept_http2) {
-				tls_accept_http2(binding->tls_config);
-			}
-#endif
 		}
 #endif
 
@@ -673,14 +663,6 @@ int run_webserver(t_settings *settings) {
 					return -1;
 				}
 			}
-		}
-
-		if (host->hpkp_data != NULL) {
-			if (create_hpkp_header(host->hpkp_data) == -1) {
-				fprintf(stderr, "Error generating HPKP header for %s.\n", host->hostname.item[0]);
-				return -1;
-			}
-			host->hpkp_data->next = NULL;
 		}
 
 		/* Initialize Server Name Indication

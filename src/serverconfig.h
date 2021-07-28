@@ -178,10 +178,6 @@ typedef struct type_binding {
 	int        time_for_request;
 
 	struct type_binding *next;
-
-#ifdef ENABLE_HTTP2
-	bool       accept_http2;
-#endif
 } t_binding;
 
 typedef struct type_directory {
@@ -284,7 +280,6 @@ typedef struct type_host {
 	TLS_cert        *ca_certificate;
 	TLS_crl         *ca_crl;
 	int             random_header_length;
-	t_hpkp_data     *hpkp_data;
 #endif
 #ifdef ENABLE_RPROXY
 	t_rproxy        *rproxy;
@@ -429,7 +424,6 @@ typedef struct type_config {
 #endif
 
 #ifdef ENABLE_TLS
-	int           min_tls_version;
 	int           dh_size;
 	TLS_cert      *ca_certificates;
 #endif

@@ -4,14 +4,14 @@ mbedtls_enable() {
 	if [ "$1" = "" ]; then
 		return
 	fi
-	perl -pi -e "s/^\/\/#define ${1}$/#define ${1}/" include/mbedtls/config.h
+	perl -pi -e "s/^\/\/#define ${1}$/#define ${1}/" include/mbedtls/mbedtls_config.h
 }
 
 mbedtls_disable() {
 	if [ "$1" = "" ]; then
 		return
 	fi
-	perl -pi -e "s/^#define ${1}$/\/\/#define ${1}/" include/mbedtls/config.h
+	perl -pi -e "s/^#define ${1}$/\/\/#define ${1}/" include/mbedtls/mbedtls_config.h
 }
 
 cd `dirname $0`
@@ -22,25 +22,27 @@ if [ ! `which curl` ]; then
 fi
 
 echo "Downloading mbed TLS latest version."
-curl -sO https://codeload.github.com/ARMmbed/mbedtls/zip/development
-unzip -q development
-rm -f development
-version=`grep "^=" mbedtls-development/ChangeLog | head -1 | cut -f4 -d' '`
+version=`curl -s https://raw.githubusercontent.com/ARMmbed/mbedtls/development/ChangeLog | grep "^=" | head -1 | cut -f4 -d' '`
+curl -sO https://codeload.github.com/ARMmbed/mbedtls/zip/refs/tags/v${version}
+unzip -q v${version}
+rm -f v${version}
 
 echo "Removing current mbed TLS library."
+rm -rf cmake
 rm -rf include
 rm -rf library
 
 echo "Installing new mbed TLS library."
-mv mbedtls-development/ChangeLog .
-mv mbedtls-development/include .
-mv mbedtls-development/library .
+mv mbedtls-${version}/ChangeLog .
+mv mbedtls-${version}/cmake .
+mv mbedtls-${version}/include .
+mv mbedtls-${version}/library .
 
+echo "Enabling threading support."
 mbedtls_enable MBEDTLS_THREADING_PTHREAD
 mbedtls_enable MBEDTLS_THREADING_C
 
-echo "Disabling RC4, secp192r1 and secp192k1."
-mbedtls_disable MBEDTLS_ARC4_C
+echo "Disabling secp192r1 and secp192k1."
 mbedtls_disable MBEDTLS_ECP_DP_SECP192R1_ENABLED
 mbedtls_disable MBEDTLS_ECP_DP_SECP192K1_ENABLED
 
@@ -52,6 +54,6 @@ fi
 echo "Cleaning up."
 rm -f include/.gitignore
 rm -f library/.gitignore
-rm -rf mbedtls-development
+rm -rf mbedtls-${version}
 
 echo "mbed TLS upgraded to version ${version}."

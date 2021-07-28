@@ -1,3 +1,13 @@
+hiawatha (11.0) stable; urgency=low
+
+  * mbed TLS updated to 3.0.0.
+  * Dropped support for TLSv1.0 and TLSv1.1. Configuration option
+    MinTLSversion removed.
+  * Dropped support for HTTP Public Key Pinning (HPKP). Configuration
+    option PublicKeyPins removed.
+
+ -- Hugo Leisink <hugo@leisink.net>  Fri, 23 Jul 2021 08:52:10 +0200
+
 hiawatha (10.12) stable; urgency=low
 
   * mbed TLS updated to 2.26.0.
