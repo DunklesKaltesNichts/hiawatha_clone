@@ -63,7 +63,7 @@ Binding {
 
 # URL TOOLKIT
 # This URL toolkit rule was made for the Banshee PHP framework,
-# which can be downloaded from http://www.banshee-php.org/
+# which can be downloaded from https://www.banshee-php.org/
 #
 #UrlToolkit {
 #	ToolkitID = banshee

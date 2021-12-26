@@ -29,41 +29,76 @@ function custom_compile {
 		exit
 	fi
 
-	while [ "${settings}" != "COMPILE" ]; do
-		settings=$(whiptail \
+	declare -A settings=()
+	settings[CMAKE_INSTALL_PREFIX]=""
+	settings[CMAKE_INSTALL_BINDIR]="usr/bin"
+	settings[CMAKE_INSTALL_SBINDIR]="usr/sbin"
+	settings[CMAKE_INSTALL_SYSCONFDIR]="etc"
+	settings[CMAKE_INSTALL_LIBDIR]="usr/lib"
+	settings[CMAKE_INSTALL_MANDIR]="usr/share/man"
+	settings[LOG_DIR]=""
+	settings[PID_DIR]=""
+	settings[WEBROOT_DIR]=""
+	settings[WORK_DIR]=""
+
+	while [ "${setting}" != "COMPILE" ]; do
+		setting=$(whiptail \
 			--backtitle "Hiawatha v${version}" \
-			--title "Select compiler setting" \
+			--title "Set compiler settings" \
 			--clear --notags \
 			--cancel-button "Exit" \
 			--menu "" 0 0 0 \
-			"DCMAKE_INSTALL_PREFIX"     "The prefix for all other CMAKE_INSTALL directories." \
-			"DCMAKE_INSTALL_BINDIR"     "Location of the ssi-cgi binary." \
-			"DCMAKE_INSTALL_SBINDIR"    "Location of the other Hiawatha binaries." \
-			"DCMAKE_INSTALL_SYSCONFDIR" "The configuration files will be installed in <path>/hiawatha." \
-			"DCMAKE_INSTALL_LIBDIR"     "The mbed TLS shared library will be installed in <path>/hiawatha." \
-			"DCMAKE_INSTALL_MANDIR"     "Manual pages will be installed in <path>/man1." \
-			"DCONFIG_DIR"               "Location of the Hiawatha configuration files." \
-			"DLOG_DIR"                  "Log directory used in the default hiawatha.conf." \
-			"DPID_DIR"                  "Location of the Hiawatha PID file." \
-			"DWEBROOT_DIR"              "Webroot directory used in the default hiawatha.conf." \
-			"DWORK_DIR"                 "Path of directory where Hiawatha can write temporary files." \
-			"" "" \
-			"COMPILE"                   "Compile Hiawatha" \
+			"CMAKE_INSTALL_PREFIX" "CMAKE_INSTALL_PREFIX = ${settings[CMAKE_INSTALL_PREFIX]}" \
+			"CMAKE_INSTALL_BINDIR" "CMAKE_INSTALL_BINDIR = ${settings[CMAKE_INSTALL_BINDIR]}" \
+			"CMAKE_INSTALL_SBINDIR" "CMAKE_INSTALL_SBINDIR = ${settings[CMAKE_INSTALL_SBINDIR]}" \
+			"CMAKE_INSTALL_SYSCONFDIR" "CMAKE_INSTALL_SYSCONFDIR = ${settings[CMAKE_INSTALL_SYSCONFDIR]}" \
+			"CMAKE_INSTALL_LIBDIR" "CMAKE_INSTALL_LIBDIR = ${settings[CMAKE_INSTALL_LIBDIR]}" \
+			"CMAKE_INSTALL_MANDIR" "CMAKE_INSTALL_MANDIR = ${settings[CMAKE_INSTALL_MANDIR]}" \
+			"LOG_DIR" "LOG_DIR = ${settings[LOG_DIR]}" \
+			"PID_DIR" "PID_DIR = ${settings[PID_DIR]}" \
+			"WEBROOT_DIR" "WEBROOT_DIR = ${settings[WEBROOT_DIR]}" \
+			"WORK_DIR" "WORK_DIR = ${settings[WORK_DIR]}" \
+			""                          "" \
+			"COMPILE_HIAWATHA"          "Compile Hiawatha" \
 			3>&1 1>&2 2>&3)
 
 		if [ $? = 1 ]; then
 			exit
 		fi
+
+		if [ "${setting}" = "" ]; then 
+			continue;
+		fi
+
+		if [ "${setting}" = "COMPILE_HIAWATHA" ]; then 
+			break;
+		fi
+
+		value=$(whiptail \
+			--backtitle "Hiawatha v${version}" \
+			--title "Select compiler setting" \
+			--clear --notags \
+			--cancel-button "Exit" \
+			--inputbox "Set value of ${setting}" 0 50 ${settings[${setting}]} \
+			3>&1 1>&2 2>&3)
+
+		settings[${setting}]=${value}
 	done
-exit
 
+	params="-DENABLE_CACHE=off -DENABLE_RPROXY=off -DENABLE_TLS=off -DENABLE_TOOLKIT=off -DENABLE_XSLT=off "
+	params+=`echo ${options} | tr '+"' '- '`
 
-	params=`echo ${options} | tr '+"' '- '`
+	for setting in "${!settings[@]}"; do
+		if [ "${settings[${setting}]}" != "" ]; then
+			params+=-D${setting}=${settings[${setting}]}" "
+		fi
+	done
+
 	rm -rf build
 	mkdir -p build
 	cd build && cmake .. ${params} && make
 
-	return 0
+	echo "The result of the compilation is in the build directory."
 }
 
 function make_debian_package {

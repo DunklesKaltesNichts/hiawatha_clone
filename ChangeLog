@@ -1,3 +1,10 @@
+hiawatha (11.1) stable; urgency=low
+
+  * mbed TLS updated to 3.1.0.
+  * Small bugfixes.
+
+ -- Hugo Leisink <hugo@leisink.net>  Thu, 23 Dec 2021 16:02:28 +0100
+
 hiawatha (11.0) stable; urgency=low
 
   * mbed TLS updated to 3.0.0.
@@ -715,7 +722,7 @@ hiawatha (6.10) stable; urgency=low
   * Prevention of cross-site request forgery. PreventCSRF option added.
   * A start and stop preference pane has been added to the MacOS X package.
   * A new dedicated website for Hiawatha has been launched. Please, visit
-  	http://www.hiawatha-webserver.org/. The welcome webpage inside the package
+  	https://www.hiawatha-webserver.org/. The welcome webpage inside the package
     has been updated to match the new design.
   * Small bugfixes and improvements.
 

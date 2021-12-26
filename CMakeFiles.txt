@@ -43,9 +43,15 @@ set(hiawatha_src
 if(NOT ENABLE_TLS AND NOT USE_SYSTEM_MBEDTLS)
 	set(hiawatha_src ${hiawatha_src}
 		mbedtls/library/base64.c
+		mbedtls/library/bignum.c
+		mbedtls/library/constant_time.c
+		mbedtls/library/md.c
 		mbedtls/library/md5.c
-		mbedtls/library/sha256.c
 		mbedtls/library/platform_util.c
+		mbedtls/library/ripemd160.c
+		mbedtls/library/sha1.c
+		mbedtls/library/sha256.c
+		mbedtls/library/sha512.c
 	)
 endif()
 
@@ -74,9 +80,15 @@ set(wigwam_src
 )
 if(NOT ENABLE_TLS AND NOT USE_SYSTEM_MBEDTLS)
 	set(wigwam_src ${wigwam_src}
+		mbedtls/library/bignum.c
+		mbedtls/library/constant_time.c
+		mbedtls/library/md.c
 		mbedtls/library/md5.c
-		mbedtls/library/sha256.c
 		mbedtls/library/platform_util.c
+		mbedtls/library/ripemd160.c
+		mbedtls/library/sha1.c
+		mbedtls/library/sha256.c
+		mbedtls/library/sha512.c
 	)
 endif()
 

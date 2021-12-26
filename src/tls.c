@@ -74,14 +74,10 @@ static int ciphersuites[] = {
 	MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 	MBEDTLS_TLS_ECDHE_RSA_WITH_CAMELLIA_256_GCM_SHA384,
 	MBEDTLS_TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256,
-	MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384,
-	MBEDTLS_TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256,
 	MBEDTLS_TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
 	MBEDTLS_TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,
 	MBEDTLS_TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,
 	MBEDTLS_TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384,
-	MBEDTLS_TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384,
-	MBEDTLS_TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256,
 	0
 };
 
@@ -525,21 +521,21 @@ int tls_get_peer_cert_info(mbedtls_ssl_context *context, char *subject_dn, char 
 
 	/* Subject DN
 	 */
-	if (mbedtls_x509_dn_gets(subject_dn, length, &(peer_cert->MBEDTLS_PRIVATE(subject))) == -1) {
+	if (mbedtls_x509_dn_gets(subject_dn, length, &(peer_cert->subject)) == -1) {
 		return -1;
 	}
 	subject_dn[length - 1] = '\0';
 
 	/* Issuer DN
 	 */
-	if (mbedtls_x509_dn_gets(issuer_dn, length, &(peer_cert->MBEDTLS_PRIVATE(issuer))) == -1) {
+	if (mbedtls_x509_dn_gets(issuer_dn, length, &(peer_cert->issuer)) == -1) {
 		return -1;
 	}
 	issuer_dn[length - 1] = '\0';
 
 	/* Serial number
 	 */
-	if (mbedtls_x509_serial_gets(serial_nr, length, &(peer_cert->MBEDTLS_PRIVATE(serial))) == -1) {
+	if (mbedtls_x509_serial_gets(serial_nr, length, &(peer_cert->serial)) == -1) {
 		return -1;
 	}
 	serial_nr[length - 1] = '\0';

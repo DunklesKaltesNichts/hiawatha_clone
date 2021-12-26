@@ -12,7 +12,7 @@
 
 NAME=hiawatha
 DAEMON=/usr/sbin/hiawatha
-PIDFILE=/var/run/hiawatha.pid
+PIDFILE=/run/hiawatha.pid
 
 set -e
 

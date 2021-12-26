@@ -211,7 +211,7 @@ int fetch_request(t_session *session) {
 							content_length = str_to_int(strstart);
 							*strend = '\r';
 							if ((content_length < 0) || (INT_MAX - content_length - 2 <= header_length)) {
-								result = 500;
+								result = 400;
 								break;
 							}
 
